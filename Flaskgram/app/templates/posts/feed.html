@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="feed-container">
+    <h2>Feed</h2>
+
+    <a href="{{ url_for('posts.create') }}" class="btn">Create Post</a>
+
+    {% if posts %}
+        {% for post in posts %}
+        <div class="post-card">
+
+            <div class="post-header">
+                <strong>{{ post.author.username }}</strong>
+                <span class="post-date">{{ post.date_posted.strftime('%B %d, %Y') }}</span>
+            </div>
+            {# post.author.username accesses the username of the user who wrote this post #}
+            {# post.author works because we defined backref='author' in the posts relationship #}
+            {# post.date_posted.strftime('%B %d, %Y') formats the datetime as "June 06, 2026" #}
+
+            <div class="post-content">
+                {{ post.content }}
+            </div>
+
+            <div class="post-actions">
+
+                <form method="POST" action="{{ url_for('posts.like', post_id=post.id) }}">
+                    {# url_for('posts.like', post_id=post.id) generates /posts/like/1 #}
+                    <button type="submit">
+                        {% if current_user in post.liked_by %}
+                            Unlike ({{ post.liked_by | length }})
+                        {% else %}
+                            Like ({{ post.liked_by | length }})
+                        {% endif %}
+                        {# post.liked_by | length counts how many users liked this post #}
+                        {# | length is a Jinja2 filter — filters modify values before displaying them #}
+                    </button>
+                </form>
+
+                {% if post.user_id == current_user.id %}
+                {# only show the delete button if the current user wrote this post #}
+                    <form method="POST" action="{{ url_for('posts.delete', post_id=post.id) }}">
+                        {# url_for('posts.delete', post_id=post.id) generates /posts/delete/1 #}
+                        <button type="submit" class="btn-danger">Delete</button>
+                    </form>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <p>No posts yet. Be the first to post!</p>
+        {# {% else %} runs when posts list is empty #}
+    {% endif %}
+
+</div>
+
+{% endblock %}

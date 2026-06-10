@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="form-container">
+    <h2>Create Post</h2>
+
+    <form method="POST" action="{{ url_for('posts.create') }}">
+    {# method="POST" sends a POST request when form is submitted #}
+    {# action="{{ url_for('posts.create') }}" sends the POST request to the create route #}
+
+        <div>
+            <label for="content">What's on your mind?</label>
+            <textarea id="content" name="content" rows="4" required></textarea>
+            {# name="content" is how Flask reads this field with request.form.get("content") #}
+            {# rows="4" makes the textarea 4 lines tall #}
+            {# required means the browser won't submit the form if content is empty #}
+        </div>
+
+        <button type="submit">Post</button>
+
+    </form>
+
+    <p><a href="{{ url_for('posts.feed') }}">Back to Feed</a></p>
+
+</div>
+
+{% endblock %}

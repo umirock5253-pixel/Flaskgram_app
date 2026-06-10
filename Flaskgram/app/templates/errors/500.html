@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="error-container">
+    <h1>500</h1>
+    <h2>Something Went Wrong</h2>
+    <p>Our server ran into a problem. Please try again later.</p>
+    <a href="{{ url_for('posts.feed') }}" class="btn">Go Home</a>
+</div>
+{% endblock %}

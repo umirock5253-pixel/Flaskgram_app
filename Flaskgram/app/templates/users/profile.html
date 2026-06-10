@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="profile-container">
+
+    <div class="profile-header">
+        <h2>{{ user.username }}</h2>
+        {# user.username displays the username of the profile being viewed #}
+
+        <p>{{ user.bio or 'No bio yet.' }}</p>
+        {# user.bio displays the bio if it exists #}
+        {# 'or' in Jinja2 works like Python's or — if user.bio is None it shows 'No bio yet.' #}
+
+        <p>
+            <strong>{{ user.posts | length }}</strong> posts &nbsp;
+            <strong>{{ user.followers | length }}</strong> followers &nbsp;
+            <strong>{{ user.following | length }}</strong> following
+        </p>
+        {# | length is a Jinja2 filter that counts the items in a list #}
+        {# user.posts | length counts total posts #}
+        {# user.followers | length counts total followers #}
+        {# user.following | length counts total following #}
+
+        {% if current_user != user %}
+        {# only show follow/unfollow button if viewing someone else's profile #}
+
+            {% if user in current_user.following %}
+            {# user in current_user.following checks if current user is already following this user #}
+
+                <form method="POST" action="{{ url_for('users.unfollow', username=user.username) }}">
+                {# url_for('users.unfollow', username=user.username) generates /users/unfollow/ali #}
+                    <button type="submit" class="btn">Unfollow</button>
+                </form>
+
+            {% else %}
+
+                <form method="POST" action="{{ url_for('users.follow', username=user.username) }}">
+                {# url_for('users.follow', username=user.username) generates /users/follow/ali #}
+                    <button type="submit" class="btn">Follow</button>
+                </form>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+    <div class="profile-posts">
+        <h3>Posts</h3>
+
+        {% if posts %}
+            {% for post in posts %}
+            <div class="post-card">
+
+                <div class="post-header">
+                    <strong>{{ user.username }}</strong>
+                    <span class="post-date">{{ post.date_posted.strftime('%B %d, %Y') }}</span>
+                </div>
+                {# post.date_posted.strftime('%B %d, %Y') formats datetime as "June 06, 2026" #}
+
+                <div class="post-content">
+                    {{ post.content }}
+                </div>
+
+                <div class="post-actions">
+                    <form method="POST" action="{{ url_for('posts.like', post_id=post.id) }}">
+                        <button type="submit">
+                            {% if current_user in post.liked_by %}
+                                Unlike ({{ post.liked_by | length }})
+                            {% else %}
+                                Like ({{ post.liked_by | length }})
+                            {% endif %}
+                        </button>
+                    </form>
+
+                    {% if post.user_id == current_user.id %}
+                    {# only show delete button if current user owns this post #}
+                        <form method="POST" action="{{ url_for('posts.delete', post_id=post.id) }}">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    {% endif %}
+                </div>
+
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <p>No posts yet.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
